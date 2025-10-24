@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Message</title>
+    <style>
+        body { font-family: -apple-system, sans-serif; background: #f0f2f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
+        .card { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center; max-width: 400px; width: 100%; }
+        h1 { color: #333; }
+        p { color: #555; }
+        input[type="password"] { width: 100%; padding: 12px; font-size: 1rem; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 10px; }
+        button { width: 100%; padding: 12px 15px; font-size: 1rem; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 15px; transition: background-color 0.2s; }
+        button:hover { background-color: #0056b3; }
+        #message-output { margin-top: 20px; }
+        #message-output pre { 
+            background: #eee; 
+            padding: 15px; 
+            border-radius: 4px; 
+            text-align: left; /* Changed for English */
+            white-space: pre-wrap; 
+            word-wrap: break-word; 
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.1rem;
+        }
+        #message-output.success pre { border: 1px solid green; color: #004d00; }
+        #message-output.error pre { border: 1px solid red; color: #a00; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Encrypted Message</h1>
+        <p>Please enter the PIN to view the message:</p>
+        <div>
+            <input type="password" id="pin-input" placeholder="Enter PIN">
+            <button id="submit-btn">View</button>
+        </div>
+        <div id="message-output"></div>
+    </div>
+
+    <script>
+        // --- Decryption Function ---
+        function caesarCipher(text, shift, mode) {
+            if (typeof shift !== 'number' || shift < 1 || shift > 25) shift = 3;
+            if (mode === 'decrypt') shift = (26 - shift) % 26;
+            return text.replace(/[a-zA-Z]/g, (char) => {
+                const charCode = char.charCodeAt(0);
+                let base;
+                if (char >= 'a' && char <= 'z') base = 'a'.charCodeAt(0);
+                else if (char >= 'A' && char <= 'Z') base = 'A'.charCodeAt(0);
+                else return char;
+                return String.fromCharCode(((charCode - base + shift) % 26) + base);
+            });
+        }
+        
+        // --- Hash Function ---
+        function simpleHash(str) {
+            let hash = 0;
+            if (str.length === 0) return hash;
+            for (let i = 0; i < str.length; i++) {
+                const char = str.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+            return hash;
+        }
+        
+        // --- Main Page Logic ---
+        let params = {};
+        let ciphertext = '';
+        let correctHash = '';
+        let decryptionKey = 0;
+
+        try {
+            // Read data from the URL hash (#)
+            const hashData = window.location.hash.substring(1);
+            hashData.split('&').forEach(pair => {
+                const [key, value] = pair.split('=');
+                params[key] = value;
+            });
+
+            // Decode data
+            correctHash = params.h;
+            decryptionKey = parseInt(params.k);
+            ciphertext = atob(params.c); // Decode from Base64
+
+            if (!correctHash || !decryptionKey || !ciphertext) {
+                throw new Error('Link data is corrupt.');
+            }
+
+        } catch (e) {
+            document.getElementById('message-output').innerHTML = '<p style="color:red;">Error: This link is invalid or corrupt.</p>';
+        }
+
+        function showMessage() {
+            const userPin = document.getElementById('pin-input').value;
+            const output = document.getElementById('message-output');
+            
+            const userHash = simpleHash(userPin).toString();
+
+            if (userHash === correctHash) {
+                // Success: Decrypt
+                const decryptedMsg = caesarCipher(ciphertext, decryptionKey, 'decrypt');
+                output.innerHTML = '<h2>Original Message:</h2><pre>' + decryptedMsg + '</pre>';
+                output.className = 'success';
+            } else {
+                // Failure: Show encrypted message
+                output.innerHTML = '<h2>Incorrect PIN!</h2><p>Encrypted Message:</p><pre>' + ciphertext + '</pre>';
+                output.className = 'error';
+            }
+        }
+        
+        document.getElementById('submit-btn').addEventListener('click', showMessage);
+        document.getElementById('pin-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') showMessage();
+        });
+    </script>
+</body>
+</html>

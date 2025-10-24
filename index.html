@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Messenger (Lite)</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+
+    <div id="dark-mode-toggle">🌙</div>
+
+    <div class="container">
+        <h1>Secure Messenger (Lite)</h1>
+
+        <details class="how-to-use">
+            <summary>How to use this tool?</summary>
+            <div>
+                <p><strong>1. Encrypt:</strong><br>
+                Type your message in the "Input" box, select a "Key" (1-25), and press "Encrypt". You can add an optional "PIN" to lock the "Auto-Decrypt" feature on the encrypted message.</p>
+
+                <p><strong>2. Manual Decrypt:</strong><br>
+                Paste the ciphertext into the "Input" box, enter the correct "Key", and press "Decrypt (Manual)".</p>
+
+                <p><strong>3. Auto-Decrypt (Attack):</strong><br>
+                Paste the ciphertext into the "Input" box and press "Auto-Decrypt". The tool will try all keys (1-25) on the first 10 words. If the message is locked with a PIN (Hash), it will ask for it first. View the "Attack Log" for details.</p>
+
+                <p><strong>4. Share Link / QR:</strong><br>
+                Type the <strong>original message</strong> in the "Input" box, add a "Key", and a "PIN". Press "Copy Share Link" or "Generate Shareable QR". This creates a special link that forces the receiver to enter the correct PIN to view the message.</p>
+            </div>
+        </details>
+        
+        <div class="io-fields">
+            <div class="field-group">
+                <label for="text-input">Input (Plaintext or Ciphertext):</label>
+                <textarea id="text-input" rows="6" placeholder="Type your message here..."></textarea>
+            </div>
+            <div class="field-group">
+                <label for="text-output">Output (Result):</label>
+                <textarea id="text-output" rows="6" readonly placeholder="The result will appear here..."></textarea>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="key-input">Key (1-25):</label>
+                <input type="number" id="key-input" min="1" max="25" value="3">
+            </div>
+            <div class="control-group buttons">
+                <button id="encrypt-btn">Encrypt</button>
+                <button id="decrypt-btn">Decrypt (Manual)</button>
+                <button id="auto-decrypt-btn">Auto-Decrypt (Attack)</button>
+            </div>
+            
+            <div class="control-group security">
+                <label for="pin-input">Optional PIN:</label>
+                <input type="password" id="pin-input" placeholder="e.g., 1234 (optional)">
+                <small>Used to lock "Auto-Decrypt" or create secure share links.</small>
+            </div>
+        </div>
+
+        <div class="tools">
+            <button id="copy-btn">Copy Output</button>
+            <button id="qr-btn">Generate Shareable QR</button>
+            <button id="log-btn" target="_blank">View Attack Log</button>
+            <button id="copy-link-btn">Copy Share Link</button>
+            <div id="qr-code-container"></div>
+        </div>
+        
+    </div>
+
+    <script src="dictionary.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Decryption Attack Log</title>
+    <style>
+        body {
+            font-family: -apple-system, sans-serif;
+            background: #f4f7f6;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background-color: #ffffff;
+            margin: 0 auto;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            max-width: 800px;
+        }
+        h1 {
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        /* Preserve line formatting */
+        pre {
+            background: #2d3748;
+            color: #f7fafc;
+            padding: 20px;
+            border-radius: 5px;
+            font-size: 1rem;
+            white-space: pre-wrap; /* Allows line wrapping */
+            word-wrap: break-word; /* Breaks long words */
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Auto-Decrypt Attack Log</h1>
+        <pre id="log-content">Latest log will be displayed here...</pre>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const logContent = localStorage.getItem('bruteForceLog');
+            if (logContent) {
+                document.getElementById('log-content').textContent = logContent;
+            } else {
+                document.getElementById('log-content').textContent = 'No log to display. Run an "Auto-Decrypt" first.';
+            }
+        });
+    </script>
+</body>
+</html>
